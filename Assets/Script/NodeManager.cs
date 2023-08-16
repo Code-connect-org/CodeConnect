@@ -7,7 +7,7 @@ using UnityEngine.Timeline;
 public class NodeManager : MonoBehaviour
 {
     public List<NodeData> nodeDatas = new List<NodeData>();
-    public List<Node> nodes = new List<Node>();
+    private List<Node> nodes = new List<Node>();
     public GameObject nodePrefab;
     public Animator plAnimator;
     // Start is called before the first frame update
@@ -29,7 +29,7 @@ public class NodeManager : MonoBehaviour
         InitializeNodes();
         foreach(Node node in nodes){
             plAnimator.Play(node.nodeData.name);
-            Destroy(Instantiate((GameObject)Resources.Load(node.nodeData.name),plAnimator.transform.position,Quaternion.identity),1.0f);
+            Destroy(Instantiate((GameObject)Resources.Load(node.nodeData.name),plAnimator.transform.position,Quaternion.identity),node.nodeData.frame * 0.1f);
             yield return StartCoroutine(node.AttackStart());
         }
     }
