@@ -475,6 +475,16 @@ MonoBehaviour:
     skill_id: 0
     heat: 0
     fail: 0
+  - name: FireBullet
+    code: 
+    element: 0
+    power: 0
+    ap: 0
+    frame: 20
+    id: 0
+    skill_id: 0
+    heat: 0
+    fail: 0
   nodePrefab: {fileID: 8095174464831375983, guid: bf7eb8f696a831243a4fbe93748eca74, type: 3}
   plAnimator: {fileID: 5866666021643323361}
 --- !u!1 &482863490
