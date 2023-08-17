@@ -32,6 +32,7 @@ public class NodeManager : MonoBehaviour
             Destroy(Instantiate((GameObject)Resources.Load(node.nodeData.name),plAnimator.transform.position,Quaternion.identity),node.nodeData.frame * 0.1f);
             yield return StartCoroutine(node.AttackStart());
         }
+        yield break;
     }
 }
 [System.Serializable]

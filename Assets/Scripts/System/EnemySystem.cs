@@ -30,17 +30,21 @@ public class BattleEnemy : BattleCharacter
         CalculateStatus(_data.hp, _data.atk, _data.def, _data.spd, _data.grow, _data.EXP);
         CalculateFrame(_data.frame);
         this.hp = this.hp_max;
+        this.animator = Instantiate((GameObject)Resources.Load("Enemys/"+_data.Name),new Vector3(-3,0,0),Quaternion.identity).GetComponent<Animator>();
+        this.animator.gameObject.name = this.Name;
     }
 
     //メソッド(外部からアクセス可能)
     public override int Attack(){
         int atk_final = this.atk * 2;
+        animator.Play("Enemy Attack 1");
         return atk_final;
     }
     public override int HitReaction(int damage, int element){
         if (HitDamage(damage, weakness[element])){
             return 0;
         }
+        animator.Play("Enemy Hit");
         return this.hp;
     }
 

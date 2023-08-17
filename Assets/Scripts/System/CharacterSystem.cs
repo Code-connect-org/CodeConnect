@@ -25,7 +25,7 @@ public abstract class BattleCharacter : Character{
     //メンバー
     protected int hp_max;
     protected int hp;
-    
+    public Animator animator;
 
     //コンストラクタ
     public BattleCharacter(int lv):base(){
