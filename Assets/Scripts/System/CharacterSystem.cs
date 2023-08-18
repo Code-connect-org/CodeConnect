@@ -25,17 +25,7 @@ public abstract class BattleCharacter : Character{
     //メンバー
     protected int hp_max;
     protected int hp;
-    
-
-    //コンストラクタ
-    public BattleCharacter(int lv):base(){
-        this.lv = lv;
-    }
-    public BattleCharacter(string name, int lv, int hp_max, int hp, int atk, int def):base(name, lv, atk, def)
-    {
-        this.hp_max = hp_max;
-        this.hp = hp;
-    }
+    public Animator animator;
 
     //メソッド(外部からアクセス可能)
     public abstract int Attack();
@@ -43,7 +33,9 @@ public abstract class BattleCharacter : Character{
 
     //メソッド(外部からアクセス不可)
     protected bool HitDamage(int damage, float elem){
+        Debug.Log(hp);
         this.hp -= (int)(damage * elem);
+        Debug.Log("[DMGLog]" + " Object:" + gameObject.name + " Damage:" + damage + " AfterHP:" + this.hp);
         return this.hp < 0;
     }
 }
