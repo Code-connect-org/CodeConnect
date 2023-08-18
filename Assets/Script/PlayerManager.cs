@@ -11,6 +11,7 @@ public class PlayerManager : MonoBehaviour
     public GameObject DeathTexPrefab;
     public RectTransform mainBarRectTrf;
     public RectTransform subBarRectTrf;
+    public GameOver GameOverObj;
 
     public int hp;
     public int maxHp;
@@ -51,6 +52,8 @@ public class PlayerManager : MonoBehaviour
             DMGTex.GetComponent<RectTransform>().localPosition = screenPos;
             death = true;
             Destroy(gameObject,2f);
+            GameOverObj.gameObject.SetActive(true);
+            StartCoroutine(GameOverObj.Gameover());
             return 0;
         }else{
             gameObject.GetComponent<Animator>().Play("Hurt");

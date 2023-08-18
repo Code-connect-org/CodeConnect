@@ -20,6 +20,6 @@ public class TitleScreen : MonoBehaviour
 
     private void LoadGameScene()
     {
-        SceneManager.LoadScene("GameScene"); // ゲームのメインシーン名に変更
+        SceneManager.LoadScene("InGameScene"); // ゲームのメインシーン名に変更
     }
 }

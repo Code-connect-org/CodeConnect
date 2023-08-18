@@ -31,6 +31,7 @@ public class BattleEnemy : BattleCharacter
     public RectTransform mainBarRectTrf;
     public RectTransform subBarRectTrf;
     private RectTransform hpBar;
+    public GameOver GameClear;
     //コンストラクタ
     public void Start(){
         this.Name = data.Name;
@@ -75,6 +76,7 @@ public class BattleEnemy : BattleCharacter
                 enemyController.playerManager.gameManager.enemys[i].transform.position = new Vector3(-3-i,0);
                 Debug.Log(enemyController.playerManager.gameManager.enemys[i].transform.position);
             }
+            if(enemyController.playerManager.gameManager.enemys.Count <= 0)StartCoroutine(GameClear.Gameover());
             Destroy(gameObject,2f);
             Destroy(hpBar.gameObject);
             Destroy(this);
