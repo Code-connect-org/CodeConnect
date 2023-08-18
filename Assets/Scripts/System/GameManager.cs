@@ -15,9 +15,6 @@ public class GameManager : MonoBehaviour
     }
     private void CreateEnemy()
     {
-<<<<<<< HEAD
-        BattleEnemy Slime = new BattleEnemy(Enemies.enemyDatas[1], 1, "A", true);
-=======
         for(int i = 0;i < Enemies.enemyDatas.Count;i++){
             Kind kind= (Kind)i;
             enemys.Add(Instantiate((GameObject)Resources.Load("Enemys/"+Enemies.enemyDatas[i].Name),new Vector3(-3 - i,0,0),Quaternion.identity).AddComponent<BattleEnemy>());
@@ -26,9 +23,6 @@ public class GameManager : MonoBehaviour
             enemys[i].animator = enemys[i].gameObject.GetComponent<Animator>();
             enemys[i].GetComponent<EnemyController>().playerManager = Player.GetComponent<PlayerManager>();
         }
->>>>>>> 5d2ce3ed5ea1014ac14b7503a9c60980394bf003
-        
-        // ...
     }
     public void ChangeEnemy(){
         List<BattleEnemy> tmp = new List<BattleEnemy>(enemys);
