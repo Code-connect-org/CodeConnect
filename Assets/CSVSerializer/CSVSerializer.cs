@@ -3,48 +3,43 @@ using System;
 using System.Text;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Linq;
+
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 
 public class CSVSerializer
 {
-    static public T[] Deserialize<T>(string text)
+    public static T[] Deserialize<T>(string text)
     {
-        return (T[])CreateArray(typeof(T), ParseCSV(text));
+        return CreateArray<T>(ParseCSV(text));
     }
 
-    static public T[] Deserialize<T>(List<string[]> rows)
+    public static T[] Deserialize<T>(List<string[]> rows)
     {
-        return (T[])CreateArray(typeof(T), rows);
+        return CreateArray<T>(rows);
     }
 
-    static public T DeserializeIdValue<T>(string text, int id_col = 0, int value_col = 1)
+    public static T DeserializeIdValue<T>(string text, int id_col = 0, int value_col = 1)
     {
-        return (T)CreateIdValue(typeof(T), ParseCSV(text), id_col, value_col);
+        return CreateIdValue<T>(ParseCSV(text), id_col, value_col);
     }
 
-    static public T DeserializeIdValue<T>(List<string[]> rows, int id_col=0, int value_col=1)
+    public static T DeserializeIdValue<T>(List<string[]> rows, int id_col = 0, int value_col = 1)
     {
-        return (T)CreateIdValue(typeof(T), rows, id_col, value_col);
+        return CreateIdValue<T>(rows, id_col, value_col);
     }
 
-    static private object CreateArray(Type type, List<string[]> rows)
+    private static T[] CreateArray<T>(List<string[]> rows)
     {
-        Array array_value = Array.CreateInstance(type, rows.Count - 1);
+        T[] array_value = new T[rows.Count - 1];
         Dictionary<string, int> table = new Dictionary<string, int>();
 
         for (int i = 0; i < rows[0].Length; i++)
         {
             string id = rows[0][i];
-            string id2 = "";
-            for (int j = 0; j < id.Length; j++)
-            {
-                if ((id[j] >= 'a' && id[j] <= 'z') || (id[j] >= '0' && id[j] <= '9'))
-                    id2 += ((char)id[j]).ToString();
-                else if (id[j] >= 'A' && id[j] <= 'Z')
-                    id2 += ((char)(id[j] - 'A' + 'a')).ToString();
-            }
+            string id2 = new string(id.Where(c => Char.IsLetterOrDigit(c)).ToArray()).ToLower();
 
             table.Add(id, i);
             if (!table.ContainsKey(id2))
@@ -53,17 +48,17 @@ public class CSVSerializer
 
         for (int i = 1; i < rows.Count; i++)
         {
-            object rowdata = Create(rows[i], table, type);
-            array_value.SetValue(rowdata, i-1);
+            T rowdata = Create<T>(rows[i], table);
+            array_value[i - 1] = rowdata;
         }
         return array_value;
     }
 
-    static object Create(string[] cols, Dictionary<string, int> table, Type type)
+    private static T Create<T>(string[] cols, Dictionary<string, int> table)
     {
-        object v = Activator.CreateInstance(type);
+        T v = Activator.CreateInstance<T>();
 
-        FieldInfo[] fieldinfo = type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+        FieldInfo[] fieldinfo = typeof(T).GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
         foreach (FieldInfo tmp in fieldinfo)
         {
             if (table.ContainsKey(tmp.Name))
@@ -76,9 +71,9 @@ public class CSVSerializer
         return v;
     }
 
-    static void SetValue(object v, FieldInfo fieldinfo, string value)
+    private static void SetValue<T>(T v, FieldInfo fieldinfo, string value)
     {
-        if (value == null || value == "")
+        if (string.IsNullOrEmpty(value))
             return;
 
         if (fieldinfo.FieldType.IsArray)
@@ -96,17 +91,17 @@ public class CSVSerializer
             fieldinfo.SetValue(v, array_value);
         }
         else if (fieldinfo.FieldType.IsEnum)
-            fieldinfo.SetValue(v, Enum.Parse(fieldinfo.FieldType, value.ToString()));
+            fieldinfo.SetValue(v, Enum.Parse(fieldinfo.FieldType, value));
         else if (value.IndexOf('.') != -1 &&
-            (fieldinfo.FieldType == typeof(Int32) || fieldinfo.FieldType == typeof(Int64) || fieldinfo.FieldType == typeof(Int16)))
+            (fieldinfo.FieldType == typeof(int) || fieldinfo.FieldType == typeof(long) || fieldinfo.FieldType == typeof(short)))
         {
-            float f = (float)Convert.ChangeType(value, typeof(float));
+            float f = Convert.ToSingle(value);
             fieldinfo.SetValue(v, Convert.ChangeType(f, fieldinfo.FieldType));
         }
 #if UNITY_EDITOR
         else if (fieldinfo.FieldType == typeof(UnityEngine.Sprite))
         {
-            Sprite sprite = AssetDatabase.LoadAssetAtPath<Sprite>(value.ToString());
+            Sprite sprite = AssetDatabase.LoadAssetAtPath<Sprite>(value);
             fieldinfo.SetValue(v, sprite);
         }
 #endif
@@ -116,9 +111,9 @@ public class CSVSerializer
             fieldinfo.SetValue(v, Convert.ChangeType(value, fieldinfo.FieldType));
     }
 
-    static object CreateIdValue(Type type, List<string[]> rows, int id_col=0, int val_col=1)
+    private static T CreateIdValue<T>(List<string[]> rows, int id_col = 0, int val_col = 1)
     {
-        object v = Activator.CreateInstance(type);
+        T v = Activator.CreateInstance<T>();
 
         Dictionary<string, int> table = new Dictionary<string, int>();
 
@@ -128,7 +123,7 @@ public class CSVSerializer
                 table.Add(rows[i][id_col].TrimEnd(' '), i);
         }
 
-        FieldInfo[] fieldinfo = type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+        FieldInfo[] fieldinfo = typeof(T).GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
         foreach (FieldInfo tmp in fieldinfo)
         {
             if (table.ContainsKey(tmp.Name))
@@ -145,7 +140,7 @@ public class CSVSerializer
         return v;
     }
 
-    static public List<string[]> ParseCSV(string text, char separator = ',')
+    public static List<string[]> ParseCSV(string text, char separator = ',')
     {
         List<string[]> lines = new List<string[]>();
         List<string> line = new List<string>();

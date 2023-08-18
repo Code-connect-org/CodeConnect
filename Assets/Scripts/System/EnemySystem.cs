@@ -16,16 +16,18 @@ public class Enemy : MonoBehaviour
 public class BattleEnemy : BattleCharacter
 {
     //メンバー
+    private bool Is_defeat;
     private float[] weakness;
     private int spd;
     private int EXP;
     private int frame;
 
     //コンストラクタ
-    public BattleEnemy(EnemyData _data, int lv, string kind):base(lv){
+    public BattleEnemy(EnemyData _data, int lv, string kind, bool Is_defeat):base(lv){
         this.Name = _data.Name;
         this.Name += kind;
         this.lv = lv;
+        this.Is_defeat = Is_defeat;
         this.weakness = new float[] { 2, 2, 2, 2 };
         CalculateStatus(_data.hp, _data.atk, _data.def, _data.spd, _data.grow, _data.EXP);
         CalculateFrame(_data.frame);

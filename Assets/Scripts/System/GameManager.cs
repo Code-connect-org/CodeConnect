@@ -9,7 +9,7 @@ public class GameManager : MonoBehaviour
 
     private void CreateEnemy()
     {
-        BattleEnemy Slime = new BattleEnemy(Enemies.enemyDatas[1], 1, "A");
+        BattleEnemy Slime = new BattleEnemy(Enemies.enemyDatas[1], 1, "A", true);
         
         // ...
     }

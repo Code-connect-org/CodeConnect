@@ -10,6 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c25c4ce26b8873143bdbf8fdd88582ed, type: 3}
-  m_Name: Area Data SO
+  m_Name: AreaDataSO
   m_EditorClassIdentifier: 
-  areaDatas: []
+  areaDatas:
+  - id: 0
+    Name: 
+    lv: 0
+    enemy: 00000000
+    lv_min: 
+    lv_max: 
+    description: 

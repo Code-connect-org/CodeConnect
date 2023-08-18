@@ -1,32 +1,38 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 [CreateAssetMenu(fileName = "EnemyDataSO", menuName = "SO/EnemyData")]
 public class EnemyDataSO : ScriptableObject
 {
     public List<EnemyData> enemyDatas = new List<EnemyData>();
+    public List<EnemyData> GetSortedDatas()
+    {
+        // LINQを使用してEnemyDataの配列をidで昇順にソート
+        List<EnemyData> sortedList = enemyDatas.OrderBy(data => data.id).ToList();
+        return sortedList;
+    }
 }
 
 [System.Serializable]
-    public class EnemyData
-    {
-        [SerializeField] public int id;
-        [SerializeField] public string Name;
-        [SerializeField] public bool[] element = new bool[4];
-        [SerializeField] public float[] weakness = new float[4];
-        [SerializeField] public bool[] effect = new bool[7];
-        [SerializeField] public float[] resist = new float[7];
-        [SerializeField] public float[] work = new float[6];
-        [SerializeField] public int hp;
-        [SerializeField] public int atk;
-        [SerializeField] public int def;
-        [SerializeField] public int spd;
-        [SerializeField] public int frame;
-        [SerializeField] public int EXP;
-        [SerializeField] public float grow;
-        [SerializeField] public string description;
-    }
+public class EnemyData
+{
+    [SerializeField] public int id;
+    [SerializeField] public string Name;
+    [SerializeField] public bool[] element = new bool[4];
+    [SerializeField] public float[] weakness = new float[4];
+    [SerializeField] public bool[] effect = new bool[7];
+    [SerializeField] public float[] resist = new float[7];
+    [SerializeField] public float[] work = new float[6];
+    [SerializeField] public int hp;
+    [SerializeField] public int atk;
+    [SerializeField] public int def;
+    [SerializeField] public int spd;
+    [SerializeField] public int frame;
+    [SerializeField] public int EXP;
+    [SerializeField] public float grow;
+    [SerializeField] public string description;
+}
 
 
 // public class InitialEnemyData : MonoBehaviour

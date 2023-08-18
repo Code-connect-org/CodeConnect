@@ -1,23 +1,43 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 [CreateAssetMenu(fileName = "AreaDataSO", menuName = "SO/AreaData", order = 1)]
 public class AreaDataSO : ScriptableObject
 {
     public List<AreaData> areaDatas = new List<AreaData>();
+    public List<AreaData> GetSortedDatas()
+    {
+        // 各AreaDataオブジェクトに対してMatchListLengthメソッドを呼び出す
+        foreach (var areaData in areaDatas)
+        {
+            areaData.MatchListLength();
+        }
+
+        // LINQを使用してEnemyDataの配列をidで昇順にソート
+        List<AreaData> sortedList = areaDatas.OrderBy(data => data.id).ToList();
+        return sortedList;
+    }
 }
 
 [System.Serializable]
 public class AreaData
 {
-    [SerializeField] private int id;
-    [SerializeField] private string Name;
-    [SerializeField] private int lv;
-    [SerializeField] private int[] enemy;
-    [SerializeField] private int[] lv_min;
-    [SerializeField] private int[] lv_max;
-    [SerializeField] private string description;
+    [SerializeField] public int id;
+    [SerializeField] public string Name;
+    [SerializeField] public int lv;
+    [SerializeField] public List<int> enemy;
+    [SerializeField] public List<int> lv_min;
+    [SerializeField] public List<int> lv_max;
+    [SerializeField] public string description;
+
+    public void MatchListLength()
+    {
+        int maxLength = Mathf.Max(enemy.Count, lv_min.Count, lv_max.Count);
+        while (enemy.Count < maxLength) enemy.Add(0);
+        while (lv_min.Count < maxLength) lv_min.Add(0);
+        while (lv_max.Count < maxLength) lv_max.Add(0);
+    }
 }
 
 // public class InitialAreaData : MonoBehaviour
