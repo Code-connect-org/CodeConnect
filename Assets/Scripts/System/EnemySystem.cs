@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class Enemy : MonoBehaviour
@@ -20,20 +21,39 @@ public class BattleEnemy : BattleCharacter
     private int spd;
     private int EXP;
     private int frame;
-
+    public EnemyData data;
+    public int kind;
+    GameObject DMGTexPrefab;
+    GameObject DeathTexPrefab;
+    GameObject canvas;
+    public EnemyController enemyController;
+    public RectTransform mainBarRectTrf;
+    public RectTransform subBarRectTrf;
+    private RectTransform hpBar;
     //コンストラクタ
-    public BattleEnemy(EnemyData _data, int lv, string kind):base(lv){
-        this.Name = _data.Name;
+    public void Start(){
+        this.Name = data.Name;
         this.Name += kind;
-        this.lv = lv;
         this.weakness = new float[] { 2, 2, 2, 2 };
-        CalculateStatus(_data.hp, _data.atk, _data.def, _data.spd, _data.grow, _data.EXP);
-        CalculateFrame(_data.frame);
+        CalculateStatus(data.hp, data.atk, data.def, data.spd, data.grow, data.EXP);
+        CalculateFrame(data.frame);
         this.hp = this.hp_max;
-        this.animator = Instantiate((GameObject)Resources.Load("Enemys/"+_data.Name),new Vector3(-3,0,0),Quaternion.identity).GetComponent<Animator>();
-        this.animator.gameObject.name = this.Name;
-    }
 
+        DMGTexPrefab = (GameObject)Resources.Load("DMGText");
+        DeathTexPrefab = (GameObject)Resources.Load("DeathText");
+        canvas = GameObject.Find("Canvas");
+        enemyController = gameObject.GetComponent<EnemyController>();
+
+        hpBar = Instantiate((GameObject)Resources.Load("HPBarPrefab"),canvas.transform).GetComponent<RectTransform>();
+        mainBarRectTrf = hpBar.transform.GetChild(1).GetComponent<RectTransform>();
+        subBarRectTrf = hpBar.transform.GetChild(0).GetComponent<RectTransform>();
+    }
+    
+    private void Update() {
+        hpBar.position = RectTransformUtility.WorldToScreenPoint(Camera.main,transform.position);
+        mainBarRectTrf.sizeDelta = new Vector2(Mathf.Clamp((float)hp/(float)hp_max*125,0,125),10);
+        if(subBarRectTrf.sizeDelta.x > 0&&mainBarRectTrf.sizeDelta.x < subBarRectTrf.sizeDelta.x)subBarRectTrf.sizeDelta -= new Vector2(15f*Time.deltaTime,0);
+    }
     //メソッド(外部からアクセス可能)
     public override int Attack(){
         int atk_final = this.atk * 2;
@@ -42,9 +62,29 @@ public class BattleEnemy : BattleCharacter
     }
     public override int HitReaction(int damage, int element){
         if (HitDamage(damage, weakness[element])){
+            animator.Play("Enemy Death");
+            GameObject DMGTex = Instantiate(DeathTexPrefab,Vector2.zero,Quaternion.identity,canvas.transform);
+            DMGTex.GetComponent<TextMeshProUGUI>().text = damage.ToString();
+            Vector2 screenPos =  RectTransformUtility.WorldToScreenPoint(Camera.main,transform.position);
+            DMGTex.GetComponent<RectTransform>().position = screenPos;
+            enemyController.playerManager.gameManager.enemys.RemoveAt(0);
+            for(int i = 0;i < enemyController.playerManager.gameManager.enemys.Count;i ++){
+                enemyController.playerManager.gameManager.enemys[i].transform.position = new Vector3(-3-i,0);
+                Debug.Log(enemyController.playerManager.gameManager.enemys[i].transform.position);
+            }
+            Destroy(gameObject,2f);
+            Destroy(hpBar.gameObject);
+            Destroy(this);
             return 0;
+        }else{
+            animator.Play("Enemy Hit");
+            GameObject DMGTex = Instantiate(DMGTexPrefab,Vector2.zero,Quaternion.identity,canvas.transform);
+            DMGTex.GetComponent<TextMeshProUGUI>().text = damage.ToString();
+            Vector2 screenPos =  RectTransformUtility.WorldToScreenPoint(Camera.main,transform.position);
+            DMGTex.GetComponent<RectTransform>().position = screenPos;
+
+            enemyController.Rigid = true;
         }
-        animator.Play("Enemy Hit");
         return this.hp;
     }
 
@@ -59,4 +99,5 @@ public class BattleEnemy : BattleCharacter
     private void CalculateFrame(int temp_frame){
         this.frame = (int)(Mathf.Exp(Mathf.Sqrt(this.spd + 12) / -5) * temp_frame * 2);
     }
+    
 }
